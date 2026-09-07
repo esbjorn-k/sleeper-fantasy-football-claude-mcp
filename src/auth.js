@@ -16,9 +16,11 @@ function tokensMatch(a, b) {
 export function bearerAuth(expectedToken) {
   return (req, res, next) => {
     const header = req.get('authorization') || '';
-    const [scheme, token] = header.split(' ');
+    const [scheme, headerToken] = header.split(' ');
+    const queryToken = typeof req.query.token === 'string' ? req.query.token : null;
+    const token = (scheme === 'Bearer' && headerToken) ? headerToken : queryToken;
 
-    if (scheme !== 'Bearer' || !token || !tokensMatch(token, expectedToken)) {
+    if (!token || !tokensMatch(token, expectedToken)) {
       res.status(401).json({
         jsonrpc: '2.0',
         error: { code: -32001, message: 'Unauthorized: missing or invalid bearer token' },
@@ -26,6 +28,11 @@ export function bearerAuth(expectedToken) {
       });
       return;
     }
+
+    next();
+  };
+}
+
 
     next();
   };
