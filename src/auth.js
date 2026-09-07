@@ -34,6 +34,3 @@ export function bearerAuth(expectedToken) {
 }
 
 
-    next();
-  };
-}
